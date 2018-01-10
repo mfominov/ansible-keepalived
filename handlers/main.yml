@@ -1,0 +1,11 @@
+---
+
+- name: restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted
+
+- name: restart keepalived
+  service:
+    name: "keepalived"
+    state: "restarted"

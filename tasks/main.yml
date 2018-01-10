@@ -1,0 +1,40 @@
+---
+
+- name: Install keepalived
+  yum:
+    name: keepalived
+    state: present
+
+#- name: Edit firawalld rules
+#  firewalld:
+#    service: "{{ item }}"
+#    permanent: true
+#    state: enabled
+#  with_items:
+#    - http
+#    - https
+#  notify: restart firewalld
+
+- name: enabling keepalived on boot and start
+  service:
+    name: "keepalived"
+    state: "started"
+    enabled: yes
+
+- name: allowing VIP to come up on both nodes
+  sysctl:
+    name: "net.ipv4.ip_nonlocal_bind"
+    value: 1
+    state: "present"
+    reload: yes
+
+- name: config_keepalived | configuring keepalived
+  template:
+    src: "keepalived.j2"
+    dest: "/etc/keepalived/keepalived.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  notify:
+    - restart keepalived
+  when: keepalived_config
